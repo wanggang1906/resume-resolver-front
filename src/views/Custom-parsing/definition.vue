@@ -1,5 +1,6 @@
 <template>
     <div class="definition">
+        <!-- 定义解析规则 -->
         <el-card class="space-card" style="margin: 20px;">
             <el-row type="flex" class="row-bg" justify="center" style="margin-top: 10px;">
                 <el-col :span="13">
@@ -16,6 +17,7 @@
                                       maxlength="15"
                                       @focus="focus =1" @blur="focus = 0"
                                       v-model="dynamicValidateForm.name"></el-input>
+                            <!-- @focus/@blur 失去/获取焦点时触发的事件 -->
                             <span v-show="focus==1" style="font-size: 12px;margin-left: 5px;color: #F56C6C;">
                                 * 输入不得超过15个字符</span>
                         </el-form-item>
@@ -100,13 +102,13 @@
                             </el-col>
                         </el-row>
 
-
+                        <!-- 卡片组件，供展示字段规则用 -->
                         <template v-if="showButton">
                             <el-card :key="index" v-for="(item,index) in lists">
                                 <h3 style="margin-top: 0">
                                     <el-row type="flex" class="row-bg" justify="space-between">
                                         <el-col :span="12">
-                                            <span class="el-nature">模块名：</span>
+                                            <span class="el-nature">模块名22：</span>
                                             <span style="margin-left: 15px;">{{item.modelName}}</span>
                                         </el-col>
                                         <el-col :span="6">
@@ -164,14 +166,12 @@
                                             @keyup.enter.native="handleInputConfirm2(index)"
                                             @blur="handleInputConfirm2(index)"
                                     ></el-input>
-                                    <el-button v-else class="button-new-tag el-addButton" size="small" @click="addKeyword2(index)">添加属性值
+                                    <el-button v-else class="button-new-tag el-addButton" size="small" @click="addKeyword2(index)">添加属性值22
                                     </el-button>
                                 </div>
-
-
                             </el-card>
-
                         </template>
+
                     </div>
                 </el-col>
             </el-row>
@@ -179,7 +179,7 @@
 
         <el-dialog title="修改模块名" :visible.sync="dialogFormVisible">
             <el-form :model="form" @submit.native.prevent>
-                <el-form-item label="模块名" :label-width="formLabelWidth">
+                <el-form-item label="模块名" label-width="120px">
                     <el-input v-model="form.name" style="width: 300px;"
                               ref="inputModel"
                               @keyup.enter.native="showDialog(1)">
@@ -192,6 +192,7 @@
             </div>
         </el-dialog>
 
+        <!-- 历史输入弹框 -->
         <el-dialog title="历史输入" :visible.sync="dialogFormHistory">
             <el-table
                     :data="tableData.slice((currentPage-1)*PageSize,currentPage*PageSize)"
@@ -251,27 +252,28 @@
                 item: [],
                 activeNames: ['1'],
                 lists: [],
+                // 动态验证表单，整个表单元素的数据
                 dynamicValidateForm: {
+                    // 域
                     domains: [{
                         value: ''
                     }],
                     domains2:[],
                     name: ''
                 },
-                dynamicTags:[],
-                dialogFormVisible: false,
-                dialogFormHistory: false,
+                dynamicTags:[], // 动态标签
+                dialogFormVisible: false, // 修改模块名弹框
+                dialogFormHistory: false, // 查看历史输入弹框
                 form: {
                     name: '',
                 },
-                formLabelWidth: '120px',
                 editIndex:-1,
-                natureIndex: -1,
-                natureWord:'',
+                natureIndex: -1, // 控制字段卡片内添加属性的tag输入框
+                natureWord:'', // 字段卡片内添加属性的tag输入框的值
                 editKeyword:'',
                 listId: 0,
                 PageSize: 7,
-                currentPage:1,//默认开始页面
+                currentPage:1, // 默认开始页面
                 tableData:[],
                 total: 0,
             }
@@ -279,8 +281,9 @@
         mounted(){
             this.getInitializeData()
         },
+        // dom初始化后执行这里的方法
         methods:{
-            // 获取数据
+            // 获取数据，post请求
             getInitializeData(){
                 this.$axios.post('/api/cv/initializeRulePackage').then(res=>{
                     if (res.data.errCode === 0) {
@@ -294,7 +297,7 @@
                 })
             },
 
-            // 获取随机ID
+            // 产生随机ID
             generateId (){
                 let min = 100;
                 let max = 999;
@@ -309,7 +312,7 @@
                 this.lists = this.item
             },
 
-            // 减少关键字input
+            // 删除关键字input
             removeDomain(item) {
                 let index = this.dynamicValidateForm.domains.indexOf(item)
                 if (this.dynamicValidateForm.domains.length>1) {
@@ -317,7 +320,7 @@
                 }
             },
 
-            // 增加关键字input  (添加ID)
+            // 增加关键字input  (添加ID)，初始值为空
             addDomain() {
                 this.dynamicValidateForm.domains.push({
                     value: '',
@@ -339,8 +342,9 @@
                 });
             },
 
-            // 表单的确定按钮  (添加ID)
+            // 顶部表单的确定按钮，参数为表单数据对象，把数据展示到下部规则卡片区
             submitForm(formName) {
+                // validate - 验证
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.disabled = false
@@ -368,7 +372,9 @@
                 this.$refs[formName].resetFields();
             },
 
-            // 获取历史数据
+            // 请求后台，获取历史数据
+            // res接受响应的所有数据，其中data为需要的数据
+            // reverse() - 颠倒数组中的顺序
             getHistoryData(){
                 this.dialogFormHistory = true
                 this.$axios.post('/api/cv/historyRule').then(res=>{
@@ -381,7 +387,7 @@
                 })
             },
 
-            // 详情按钮
+            // 历史输入弹框中的编辑按钮
             handleEdit(index, row) {
                 if (this.lists.length !== 0){
                     this.$confirm('检测到有待提交的数据, 是否继续?', '提示', {
@@ -453,6 +459,11 @@
                 this.dialogFormVisible = true
                 this.listId = id
                 this.form.name = ''
+                // 等页面刷新完后再执行回调(箭头函数)的方法
+                // Vue 实现响应式并不是数据发生变化之后 DOM 立即变化，而是按一定的策略进行 DOM 的更新
+                // ref - 被用来给dom元素或子组件注册引用信息，引用信息将会注册在父组件的$refs对象上。若在
+                // 普通dom元素上使用，引用指向的就是dom元素，若在子组件上，引用的就是指向组件实例
+                // $refs - 是一个对象，持有所有注册过的ref的dom
                 this.$nextTick(() => {
                     this.$refs['inputModel'].focus()
                 })

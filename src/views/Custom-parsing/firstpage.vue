@@ -1,5 +1,6 @@
 <template>
     <el-card style="margin: 20px;">
+        <!-- margin 外边距，值可有1-4个 -->
         <div class="block">
             <el-timeline>
                 <el-timeline-item timestamp="1、定义解析规则" placement="top">
